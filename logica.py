@@ -94,7 +94,7 @@ class Formula :
                 return 2, 'beta'
             elif self.conectivo == '>':
                 return 3, 'beta' 
-    def SATtableaux(self):
+    def SATtableaux_anchura(self):
         estado = nodos_tableaux([self])
         res = estado.es_hoja()
         if res == 'cerrada':
@@ -113,7 +113,37 @@ class Formula :
                     elif res == None:
                         frontera.append(a)
         return None 
-    
+    def SATtableaux_profundidad(self):
+        estado = nodos_tableaux([self])
+        res = estado.es_hoja()
+        if res == 'cerrada':
+            return None
+        elif res == 'abierta':
+            return estado.interp()
+        frontera = [estado]
+        while len(frontera) > 0:
+            estado = frontera.pop(0)
+            hijos = estado.expandir()
+            for a in hijos:
+                if a != None:
+                    res = a.es_hoja()
+                    if res == 'abierta':
+                        return a.interp()
+                    elif res == None:
+                        frontera.append(a)
+        return None  
+    def SATbacktracking(self, nodo):
+        estado = nodo
+        res = estado.es_hoja()
+        if res == 'cerrada':
+            return None
+        elif res == 'abierta':
+            return estado.interp()
+        for hijo in estado.expandir(): 
+            resultado = self.SATbacktracking(hijo) 
+            if resultado != None: 
+                return resultado
+        return None
     def ver(self, D):
         '''
         Visualiza una fórmula A (como string en notación inorder) usando el descriptor D
