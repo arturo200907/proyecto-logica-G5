@@ -10,8 +10,6 @@ from types import MethodType
 
 
 
-
-
 def escribir_grafos(self, literal):
     if '-' in literal:
         atomo = literal[1:]
