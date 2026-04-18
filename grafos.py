@@ -53,8 +53,32 @@ class Grafos:
         self.reglas = [r1, r2, r3] 
 
     def regla1(self): 
-        #TODO
-        return "Por hacer"
+        h_conec = [(a,b) for (a,b) in self.recorridos if a=='H'] 
+        formula_final = []
+        t = 1
+
+        formula_final = ""
+
+        for recorrido in h_conec: 
+            # El inicio es el movimiento actual de H
+            # No lleva "-" porque este es el que "ocurre"
+            formula_actual = self.To.ravel([recorrido, t])
+            
+            # Filtramos los otros movimientos
+            otros_movimientos = [m for m in self.recorridos if m != recorrido]    
+            
+            # CONSTRUCCIÓN DE LA FORMULA
+            # Por cada iteración vamos concatenando lo que ya teníamos
+            for mov in otros_movimientos: 
+                formula_actual = "(" + formula_actual + "Y-" + self.To.ravel([mov, t]) + ")"
+            
+            # VAMOS AÑADIENDO A LA FORMULA FINAL LAS FORMULAS QUE VAMOS HACIENDO
+            if formula_final =="":
+                formula_final = formula_actual 
+            else:
+                formula_final = "(" + formula_final + "O" + formula_actual + ")" 
+        return formula_final
+
 
     def regla2(self):
         #TODO 
