@@ -83,10 +83,14 @@ class Grafos:
         plt.figure(figsize=(5, 6))
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
-        pos = nx.spring_layout(G, seed=6)
-        nx.draw_networkx_nodes(G, pos, node_color='lightblue', node_size=1000)
+        pos = {
+            'C': (1, 2), 'D': (3, 2),
+            'A': (0, 1), 'B': (2, 1), 'E': (4, 1),
+            'G': (1, 0), 'H': (3, 0)
+        } 
+        nx.draw_networkx_nodes(G, pos, node_color='white', node_size=1000,  edgecolors="black")
         nx.draw_networkx_labels(G, pos, font_weight='bold')
-        nx.draw_networkx_edges(G, pos, width=2, edge_color='lightgray')
+        nx.draw_networkx_edges(G, pos, width=2, edge_color='black',)
         
         if dict_atomos is not None: 
             movement_list = [] 
