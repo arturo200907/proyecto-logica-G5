@@ -81,7 +81,6 @@ class Grafos:
 
     def visualizar_grafo(self, dict_atomos=""):
         #Creamos una copia para asegurarnos que no pase 
-        copia_dict_atomos = dict_atomos.copy()
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
         pos = nx.spring_layout(G, seed=6)
@@ -90,17 +89,17 @@ class Grafos:
         nx.draw_networkx_nodes(G, pos, node_color='lightblue', node_size=1000)
         nx.draw_networkx_labels(G, pos, font_weight='bold')
         nx.draw_networkx_edges(G, pos, width=2, edge_color='lightgray')
-        movement_list = []
+        movement_list = [] 
+        
 
         if copia_dict_atomos: # 
+            copia_dict_atomos = dict_atomos.copy()
             #IMPORTANTE: DEL DICCIONARIO SOLO TOMAMOS AQUELLOS VALORES QUE SON VERDADEROS
             for atomo in dict_atomos: 
                 if copia_dict_atomos[atomo] == True:  
                     #Decodifica el atomo y lo vuelve una tripla
                     triple = self.triple_conversion(atomo)  
-                    print(triple)
                     movement_list.append(triple)
-            print(movement_list)
 
             propiedades_caja = dict(
                 boxstyle='round,pad=0.3',
@@ -108,12 +107,10 @@ class Grafos:
                 facecolor='white',        
                 alpha=0.9                
             )
-
-            for triple in movement_list:  
-                v1, v2, turno = triple # Desempaquetado rápido de la tupla
             
-                # CORRECCIÓN AQUÍ: G y pos van primero.
-                # Eliminamos v1, v2 y turno de los argumentos porque no existen en la función.
+            for triple in movement_list:  
+                v1, v2, turno = triple  #Tripla
+            
                 nx.draw_networkx_edges(
                     G,
                     pos,
