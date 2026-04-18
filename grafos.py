@@ -39,13 +39,13 @@ class Grafos:
         self.aristas_base = [ 
         ('H','G'),('H','B'),('H','E'),('G','A'),('A','B'),('B','C'),('C','D'),('D','E')
         ] 
-        recorridos = []
+        self.recorridos = []
         for u, v in self.aristas_base:
-            recorridos.append((u, v))
-            recorridos.append((v, u)) 
+            self.recorridos.append((u, v))
+            self.recorridos.append((v, u)) 
         turnos = 8
         
-        self.To = Descriptor([recorridos, turnos])
+        self.To = Descriptor([self.recorridos, turnos])
         self.To.escribir = MethodType(escribir_grafos, self.To)
         r1 = self.regla1()
         r2 = self.regla2()

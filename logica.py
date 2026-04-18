@@ -132,18 +132,25 @@ class Formula :
                     elif res == None:
                         frontera.append(a)
         return None  
-    def SATbacktracking(self, nodo):
-        estado = nodo
+    def SATtableaux_backtracking(self, nodo=None):
+        # 1. Para la primera llamada transformamos la fórmula a nodo
+        if nodo is None:
+            estado = nodos_tableaux([self])
+        else:
+            # 2. Para las recursiones ya son nodos asi que no pasa nada
+            estado = nodo
         res = estado.es_hoja()
         if res == 'cerrada':
             return None
         elif res == 'abierta':
             return estado.interp()
         for hijo in estado.expandir(): 
-            resultado = self.SATbacktracking(hijo) 
+            resultado = self.SATtableaux_backtracking(hijo) 
             if resultado != None: 
                 return resultado
-        return None
+        return None 
+    
+    
     def ver(self, D):
         '''
         Visualiza una fórmula A (como string en notación inorder) usando el descriptor D
@@ -460,4 +467,5 @@ class nodos_tableaux:
             n2.literales = f_literales2
             return [n1, n2]
         else:
-            return []
+            return [] 
+    
