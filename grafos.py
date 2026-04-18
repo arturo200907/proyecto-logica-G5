@@ -79,24 +79,20 @@ class Grafos:
         return (tupla[0], tupla[1], t)
     
 
-    def visualizar_grafo(self, dict_atomos=""):
-        #Creamos una copia para asegurarnos que no pase 
+    def visualizar_grafo(self, dict_atomos=None):   
+        plt.figure(figsize=(5, 6))
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
         pos = nx.spring_layout(G, seed=6)
-    
-        plt.figure(figsize=(5, 6))
         nx.draw_networkx_nodes(G, pos, node_color='lightblue', node_size=1000)
         nx.draw_networkx_labels(G, pos, font_weight='bold')
         nx.draw_networkx_edges(G, pos, width=2, edge_color='lightgray')
-        movement_list = [] 
         
-
-        if copia_dict_atomos: # 
-            copia_dict_atomos = dict_atomos.copy()
+        if dict_atomos is not None: 
+            movement_list = [] 
             #IMPORTANTE: DEL DICCIONARIO SOLO TOMAMOS AQUELLOS VALORES QUE SON VERDADEROS
             for atomo in dict_atomos: 
-                if copia_dict_atomos[atomo] == True:  
+                if dict_atomos[atomo] == True:  
                     #Decodifica el atomo y lo vuelve una tripla
                     triple = self.triple_conversion(atomo)  
                     movement_list.append(triple)
@@ -107,10 +103,25 @@ class Grafos:
                 facecolor='white',        
                 alpha=0.9                
             )
-            
+            #NO QUEREMOS QUE UN TIEMPO TAPE AL OTRO, ASI QUE CADA VEZ QUE SE REPITAN LAS ARISTAS 
+            #IREMOS ACUMULANDO LOS TIEMPOS MEDIANTE UN DICCIONARIO QUE TENDRÁ LA FORMA DE 
+            #{(TUPLA1):[TIEMPOS], (TUPLA2):[TIEMPOS]
+            aristas_ocupadas = {}
+
             for triple in movement_list:  
                 v1, v2, turno = triple  #Tripla
-            
+
+                #PEQUEÑO ALGORITMO PARA QUE SE GUARDEN LOS TIEMPOS DE CADA ARISTA EN UNA LISTA
+                if((v1,v2) not in aristas_ocupadas):
+                    aristas_ocupadas[v1,v2] =[turno]
+                    aristas_ocupadas[v2,v1] = [turno]
+                else:
+                    item_aristas1 = aristas_ocupadas.get((v1,v2), f"ERROR OBTENIENDO LA INFORMACIÓN DE LA ARISTA {v1},{v2}") 
+                    item_aristas2 = aristas_ocupadas.get((v2,v1), f"ERROR OBTENIENDO LA INFORMACIÓN DE LA ARISTA {v1},{v2}")
+                    
+                    item_aristas1.append(turno) 
+                    item_aristas2.append(turno) 
+
                 nx.draw_networkx_edges(
                     G,
                     pos,
@@ -125,11 +136,11 @@ class Grafos:
                 nx.draw_networkx_edge_labels(
                     G,
                     pos,
-                    edge_labels={(v1, v2): f"Turno {turno}"},
+                    edge_labels={(v1, v2): f"Turno {",".join(map(str, aristas_ocupadas[(v1,v2)]))}"},
                     font_color='red',
                     font_weight='bold',
                     bbox=propiedades_caja
-                )
+                ) 
         
         plt.title("Problema de grafos")
         plt.axis('off')
