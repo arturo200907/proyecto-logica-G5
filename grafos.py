@@ -43,14 +43,16 @@ class Grafos:
         for u, v in self.aristas_base:
             self.recorridos.append((u, v))
             self.recorridos.append((v, u)) 
-        turnos = 8
+        self.turnos = 8
         
-        self.To = Descriptor([self.recorridos, turnos])
+        self.To = Descriptor([self.recorridos, self.turnos])
         self.To.escribir = MethodType(escribir_grafos, self.To)
         r1 = self.regla1()
         r2 = self.regla2()
-        r3 = self.regla3()
-        self.reglas = [r1, r2, r3] 
+        r3 = self.regla3() 
+        r4= self.regla4() 
+        r5 = self.regla5()
+        self.reglas = [r1, r2, r3,r4,r5] 
 
     def regla1(self): 
         h_conec = [(a,b) for (a,b) in self.recorridos if a=='H'] 
@@ -84,7 +86,7 @@ class Grafos:
         b_conec = [(a,b) for (a,b) in self.recorridos if b=='B' ]   
 
         formula_final = ""
-        t = 7  
+        t = 8  
 
         for recorrido in b_conec: 
             movimiento_actual = recorrido  # Ya es una tupla (u, v)
