@@ -81,8 +81,35 @@ class Grafos:
 
 
     def regla2(self):
-        #TODO 
-        return "Por hacer"  
+        b_conec = [(a,b) for (a,b) in self.recorridos if b=='B' ]   
+
+        formula_final = ""
+        t = 7  
+
+        for recorrido in b_conec: 
+            movimiento_actual = recorrido  # Ya es una tupla (u, v)
+            
+            # Filtramos los otros movimientos
+            otros_movimientos = [m for m in self.recorridos if m != movimiento_actual]    
+            
+            formula1 = ""
+            inicial = True 
+            
+            for mov in otros_movimientos: 
+                if inicial: 
+                    formula1 = "-" + self.To.ravel([mov, t]) 
+                    inicial = False 
+                else: 
+                    formula1 = "(" + formula1 + "Y-" + self.To.ravel([mov, t]) + ")" 
+            
+            bloque_actual = "(" + self.To.ravel([movimiento_actual, t]) + "Y" + formula1 + ")" 
+            
+            if formula_final == "":
+                formula_final = bloque_actual 
+            else:
+                formula_final = "(" + formula_final + "O" + bloque_actual + ")"
+
+        return formula_final
     
     def regla3(self): 
         #TODO
