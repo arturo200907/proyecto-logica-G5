@@ -203,11 +203,12 @@ def inorder_to_tree(cadena:str) -> Formula:
                 counter += 1
             elif cadena[i] == ")":
                 counter -=1
-            elif cadena[i] in CONECTIVOS and counter == 0:
+            # ------ CORRECCIÓN AQUÍ ------
+            elif cadena[i] in CONECTIVOS_BINARIOS and counter == 0:
+            # -----------------------------
                 return Binario(cadena[i], inorder_to_tree(cadena[1:i]),inorder_to_tree(cadena[i + 1:-1]))
     else:
         raise Exception('¡Cadena inválida! Revise la composición de paréntesis de la fórmula.\nRecuerde que solo los conectivos binarios incluyen paréntesis en la fórmula.')
-
         
         
 class Descriptor :
