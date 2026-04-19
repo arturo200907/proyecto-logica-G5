@@ -114,8 +114,32 @@ class Grafos:
         return formula_final
     
     def regla3(self): 
-        #TODO
-        return "Por hacer"  
+        formula_movimiento_unico_lista = []
+
+        for t in range(self.turnos):
+            bloques_turno = []
+            
+            for recorrido in self.recorridos:
+                # La semilla: este movimiento ocurre en el turno t
+                semilla = self.To.ravel([recorrido, t])
+                
+                # Generamos la lista de negaciones
+                otros = [m for m in self.recorridos if m != recorrido]
+                negaciones_lista = ["-" + To.ravel([otro_mov, t]) for otro_mov in otros]
+                
+                # Unimos las negaciones con Ytoria
+                formula_negaciones = Ytoria(negaciones_lista)
+                
+                # Bloque: (Mov1_t Y (-Mov2_t Y -Mov3_t...))
+                bloque_cebolla = "( + {semilla}+ Y+ {formula_negaciones}+ )"
+                bloques_turno.append(bloque_cebolla)
+                
+            # Unimos cada bloque_cebolla con Otoria
+            formula_movimiento_unico_lista.append(Otoria(bloques_turno))
+
+        # Unimos todo el movimiento único con Ytoria
+        formula_movimiento_unico = Ytoria(formula_movimiento_unico_lista)
+        return formula_movimiento_unico
 
     def regla4(self):
         #TODO 
