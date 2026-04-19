@@ -125,13 +125,13 @@ class Grafos:
                 
                 # Generamos la lista de negaciones
                 otros = [m for m in self.recorridos if m != recorrido]
-                negaciones_lista = ["-" + To.ravel([otro_mov, t]) for otro_mov in otros]
-                
+                negaciones_lista = ["-" + self.To.ravel([otro_mov, t]) for otro_mov in otros]
+
                 # Unimos las negaciones con Ytoria
                 formula_negaciones = Ytoria(negaciones_lista)
                 
                 # Bloque: (Mov1_t Y (-Mov2_t Y -Mov3_t...))
-                bloque_cebolla = "( + {semilla}+ Y+ {formula_negaciones}+ )"
+                bloque_cebolla = "(" + semilla + "Y"+ formula_negaciones + ")"
                 bloques_turno.append(bloque_cebolla)
                 
             # Unimos cada bloque_cebolla con Otoria
