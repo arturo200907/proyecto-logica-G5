@@ -213,7 +213,7 @@ class Grafos:
                     arrowstyle='->',
                     arrowsize=30
                 )
-
+                
                 nx.draw_networkx_edge_labels(
                     G,
                     pos,
