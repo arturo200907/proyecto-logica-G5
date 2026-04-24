@@ -156,8 +156,10 @@ class Grafos:
         return (tupla[0], tupla[1], t)
     
 
-    def visualizar_grafo(self, dict_atomos=None, custom_size=(5,6)):   
-        plt.figure(figsize=custom_size)
+    def visualizar_grafo(self, dict_atomos=None, custom_size=(5,6), digraph=False):    
+
+        
+        plt.figure(figsize=custom_size)  
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
         pos = {
