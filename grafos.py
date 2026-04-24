@@ -142,11 +142,90 @@ class Grafos:
         return formula_movimiento_unico
 
     def regla4(self):
-        #TODO 
-        return "Por hacer"    
+        #REGLA 4
+        formula_lista_aristas = [] 
+
+        for pair in self.recorridos: 
+            v1, v2 = pair[0], pair[1]
+            
+            formula_t_actual = ''
+            inicial_t = True
+            
+            for t in range(self.turnos):
+                # 1. Construimos la parte de "en los OTROS turnos no paso"
+                formula_l_otros = ''
+                inicial_l = True
+                
+                for l in range(self.turnos):
+                    if l != t:
+                        # Si paso en t, no paso en l (ni de v1 a v2, ni de v2 a v1)
+                        componente_l = "-(" + self.To.ravel([(v1, v2), l]) + "O" + self.To.ravel([(v2, v1), l]) + ")"
+                        
+                        if inicial_l:
+                            formula_l_otros = componente_l
+                            inicial_l = False
+                        else:
+                            formula_l_otros = "(" + formula_l_otros + "Y" + componente_l + ")"
+                
+                # 2. Creamos la implicación: (Paso en t > No paso en otros l)
+                regla_t = "(" + self.To.ravel([(v1, v2), t]) + ">" + formula_l_otros + ")"
+                
+                if inicial_t:
+                    formula_t_actual = regla_t
+                    inicial_t = False
+                else:
+                    formula_t_actual = "(" + formula_t_actual + "Y" + regla_t + ")"
+                    
+            # Guardamos la regla completa de esta arista específica
+            formula_lista_aristas.append(formula_t_actual)
+
+        # 3. Unimos todas las aristas con una gran "Y" final (también en forma de cebolla)
+        formula_final = ''
+        inicial_final = True
+
+        for f in formula_lista_aristas:
+            if inicial_final:
+                formula_final = f
+                inicial_final = False
+            else:
+                formula_final = "(" + formula_final + "Y" + f + ")"
+        return formula_final    
+    
+
+
     def regla5(self):
-        #TODO 
-        return "Por hacer"   
+        formula_lista = []  
+
+        for t in range(1, self.turnos):
+            for (i, j) in self.recorridos:
+
+                # disyunción de todos los (j,k) en recorridos 
+                salidas_desde_j = [(a, b) for (a, b) in self.recorridos if a == j]
+
+                inicial = True
+                formula_consecuente = ''
+                for (a, b) in salidas_desde_j:
+                    atomo = self.To.ravel([(a, b), t])
+                    if inicial:
+                        formula_consecuente = atomo
+                        inicial = False
+                    else:
+                        formula_consecuente = "(" + formula_consecuente + "O" + atomo + ")"
+
+                # antecedente: To(i,j,t-1)
+                formula_antecedente = self.To.ravel([(i, j), t - 1])
+
+                # implicación: (antecedente > consecuente) 
+                formula_implicacion = "(" + formula_antecedente + ">" + formula_consecuente + ")"
+                formula_lista.append(formula_implicacion)
+
+        # conjunción de todas las implicaciones (cebolla con Y) 
+        formula_completa = formula_lista[0]
+        for f in formula_lista[1:]:
+            formula_completa = "(" + formula_completa + "Y" + f + ")"
+
+        print(visualizar_formula(formula_completa, self.To)) 
+        return formula_completa  
     
     #ESTA ES UNA FUNCIÓN AUXILIAR PARA VISUALIZAR QUE DEVUELVE UNA TRIPLA ("X","Y",t)
     def triple_conversion(self, atomo): 
