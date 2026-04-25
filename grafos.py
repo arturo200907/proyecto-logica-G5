@@ -195,7 +195,6 @@ class Grafos:
 
     def regla5(self):
         formula_lista = []  
-
         for t in range(1, self.turnos):
             for (i, j) in self.recorridos:
 
