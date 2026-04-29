@@ -223,7 +223,6 @@ class Grafos:
         for f in formula_lista[1:]:
             formula_completa = "(" + formula_completa + "Y" + f + ")"
 
-        print(visualizar_formula(formula_completa, self.To)) 
         return formula_completa  
     
     #ESTA ES UNA FUNCIÓN AUXILIAR PARA VISUALIZAR QUE DEVUELVE UNA TRIPLA ("X","Y",t)
