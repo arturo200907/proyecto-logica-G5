@@ -652,6 +652,15 @@ def a_clausal(A):
     B = [c.split('O') for c in B]
     return B 
 
+'''
+-----------------------------------------------
+-----------------DPLLL -----------------------
+----------------------------------------------
+
+'''
+
+
+
 def tseitin(A):
     '''
     Algoritmo de transformacion de Tseitin
@@ -699,4 +708,45 @@ def tseitin(A):
     else:
         atomo = letrasp_tseitin[i]
     B = [[[atomo]]] + [a_clausal(x) for x in L]
-    return B
+    return B 
+
+def complemento(l):
+    if '-' in l:
+        return l[1:]
+    else:
+        return '-' + l
+    
+def eliminar_literal(S, l):
+    S1 = [c for c in S if l not in c]
+    lc = complemento(l)
+    return [[p for p in c if p != lc] for c in S1] 
+
+def extender_I(I, l):
+    I1 = {k:I[k] for k in I if k != l}
+    if '-' in l:
+        I1[l[1:]] = False
+    else:
+        I1[l] = True
+    return I1
+
+def unit_propagate(S, I):
+    '''
+    Algoritmo para eliminar clausulas unitarias de un conjunto de clausulas, manteniendo su satisfacibilidad
+    Input: 
+        - S, conjunto de clausulas
+        - I, interpretacion (diccionario {literal: True/False})
+    Output: 
+        - S, conjunto de clausulas
+        - I, interpretacion (diccionario {literal: True/False})
+    '''
+    while [] not in S:
+        l = ''
+        for x in S:
+            if len(x) == 1:
+                l = x[0]
+                S = eliminar_literal(S, l)
+                I = extender_I(I, l)
+                break
+        if l == '': # Se recorrió todo S y no se encontró unidad
+            break
+    return S, I
