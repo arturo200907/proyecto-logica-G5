@@ -1,7 +1,8 @@
 from itertools import product
 import numpy as np
 from copy import deepcopy
-from typing import List, Dict
+from typing import List, Dict 
+from random import choice, uniform, randint
 
 
 '''
@@ -670,16 +671,16 @@ def tseitin(A):
     # Creamos letras proposicionales nuevas
     f = inorder_to_tree(A)
     letrasp = f.letras()
-    cods_letras = [ord(x) for x in letrasp] 
+    cods_letras = [ord(x) for x in letrasp]
     m = max(cods_letras) + 256
-    letrasp_tseitin = [chr(x) for x in range(m, m + f.num_conec())] 
+    letrasp_tseitin = [chr(x) for x in range(m, m + f.num_conec())]
     letrasp = list(letrasp) + letrasp_tseitin
     L = [] # Inicializamos lista de conjunciones
     Pila = [] # Inicializamos pila
     i = -1 # Inicializamos contador de variables nuevas
-    s = A[0] # Inicializamos símbolo de trabajo 
-    counter = 0
-    while len(A) > 0: # Recorremos la cadena 
+    s = A[0] # Inicializamos símbolo de trabajo
+    while len(A) > 0: # Recorremos la cadena
+        # print("Pila:", Pila, " L:", L, " s:", s)
         if (s in letrasp) and (len(Pila) > 0) and (Pila[-1]=='-'):
             i += 1
             atomo = letrasp_tseitin[i]
@@ -708,8 +709,36 @@ def tseitin(A):
     else:
         atomo = letrasp_tseitin[i]
     B = [[[atomo]]] + [a_clausal(x) for x in L]
+    B = [val for sublist in B for val in sublist]
     return B 
 
+def dpll(S, I):
+    '''
+    Algoritmo para verificar la satisfacibilidad de una formula, y encontrar un modelo de la misma
+    Input:
+        - S, conjunto de clausulas
+        - I, interpretacion (diccionario literal->True/False)
+    Output:
+        - String, Satisfacible/Insatisfacible
+        - I ,interpretacion (diccionario literal->True/False)
+    '''
+    S, I = unit_propagate(S, I)
+    if len(S) == 0:
+        return "Satisfacible", I
+    if [] in S:
+        return "Insatisfacible", {}
+    l = choice(choice(S))
+    lc = complemento(l)
+    newS = eliminar_literal(S, l)
+    newI = extender_I(I, l)
+    sat, newI = dpll(newS, newI)
+    if sat == "Satisfacible":
+        return sat, newI
+    else:
+        newS = eliminar_literal(S, lc)
+        newI = extender_I(I, lc)
+        return dpll(newS, newI) 
+    
 def complemento(l):
     if '-' in l:
         return l[1:]
