@@ -9,7 +9,6 @@ from types import MethodType
 
 
 
-
 def escribir_grafos(self, literal):
     if '-' in literal:
         atomo = literal[1:]
@@ -116,7 +115,7 @@ class Grafos:
     def regla3(self): 
         formula_movimiento_unico_lista = []
 
-        for t in range(self.turnos):
+        for t in range(1,9):
             bloques_turno = []
             
             for recorrido in self.recorridos:
@@ -142,60 +141,31 @@ class Grafos:
         return formula_movimiento_unico
 
     def regla4(self):
-        #REGLA 4
-        formula_lista_aristas = [] 
-
-        for pair in self.recorridos: 
-            v1, v2 = pair[0], pair[1]
-            
-            formula_t_actual = ''
-            inicial_t = True
-            
-            for t in range(self.turnos):
-                # 1. Construimos la parte de "en los OTROS turnos no paso"
-                formula_l_otros = ''
-                inicial_l = True
-                
-                for l in range(self.turnos):
-                    if l != t:
-                        # Si paso en t, no paso en l (ni de v1 a v2, ni de v2 a v1)
-                        componente_l = "-(" + self.To.ravel([(v1, v2), l]) + "O" + self.To.ravel([(v2, v1), l]) + ")"
-                        
-                        if inicial_l:
-                            formula_l_otros = componente_l
-                            inicial_l = False
-                        else:
-                            formula_l_otros = "(" + formula_l_otros + "Y" + componente_l + ")"
-                
-                # 2. Creamos la implicación: (Paso en t > No paso en otros l)
-                regla_t = "(" + self.To.ravel([(v1, v2), t]) + ">" + formula_l_otros + ")"
-                
-                if inicial_t:
-                    formula_t_actual = regla_t
-                    inicial_t = False
-                else:
-                    formula_t_actual = "(" + formula_t_actual + "Y" + regla_t + ")"
-                    
-            # Guardamos la regla completa de esta arista específica
-            formula_lista_aristas.append(formula_t_actual)
-
-        # 3. Unimos todas las aristas con una gran "Y" final (también en forma de cebolla)
-        formula_final = ''
-        inicial_final = True
-
-        for f in formula_lista_aristas:
-            if inicial_final:
-                formula_final = f
-                inicial_final = False
-            else:
-                formula_final = "(" + formula_final + "Y" + f + ")"
-        return formula_final    
+        
+        from itertools import combinations
+    
+        clausulas = []
+    
+        # Para cada arista base, ninguna de sus dos direcciones puede aparecer
+        # en más de un turno. Tomamos todos los pares de turnos posibles.
+        for (v1, v2) in self.aristas_base:
+            # Todos los átomos relacionados con esta arista (ambas direcciones, todos los turnos)
+            atomos_arista = []
+            for t in range(1,9):
+                atomos_arista.append(self.To.ravel([(v1, v2), t]))
+                atomos_arista.append(self.To.ravel([(v2, v1), t]))
+        
+            # Para cada par de átomos, no pueden ser ambos verdaderos
+            for a1, a2 in combinations(atomos_arista, 2):
+                clausulas.append(f"(-{a1}O-{a2})")
+    
+        return Ytoria(clausulas) 
     
 
 
     def regla5(self):
         formula_lista = []  
-        for t in range(1, self.turnos):
+        for t in range(1, 9):
             for (i, j) in self.recorridos:
 
                 # disyunción de todos los (j,k) en recorridos 
