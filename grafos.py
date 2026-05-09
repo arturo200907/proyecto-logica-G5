@@ -56,7 +56,7 @@ class Grafos:
     def regla1(self): 
         h_conec = [(a,b) for (a,b) in self.recorridos if a=='H'] 
         formula_final = []
-        t = 1
+        t = 0
 
         formula_final = ""
 
@@ -85,7 +85,7 @@ class Grafos:
         b_conec = [(a,b) for (a,b) in self.recorridos if b=='B' ]   
 
         formula_final = ""
-        t = 8  
+        t = 7
 
         for recorrido in b_conec: 
             movimiento_actual = recorrido  # Ya es una tupla (u, v)
@@ -112,33 +112,42 @@ class Grafos:
 
         return formula_final
     
-    def regla3(self): 
-        formula_movimiento_unico_lista = []
+    def regla3(self):
+        formula_final_lista = []
 
-        for t in range(1,9):
-            bloques_turno = []
-            
-            for recorrido in self.recorridos:
-                # La semilla: este movimiento ocurre en el turno t
-                semilla = self.To.ravel([recorrido, t])
-                
-                # Generamos la lista de negaciones
-                otros = [m for m in self.recorridos if m != recorrido]
-                negaciones_lista = ["-" + self.To.ravel([otro_mov, t]) for otro_mov in otros]
+        # Recorremos cada arista NO DIRIGIDA
+        for (v1, v2) in self.aristas_base:
 
-                # Unimos las negaciones con Ytoria
-                formula_negaciones = Ytoria(negaciones_lista)
-                
-                # Bloque: (Mov1_t Y (-Mov2_t Y -Mov3_t...))
-                bloque_cebolla = "(" + semilla + "Y"+ formula_negaciones + ")"
-                bloques_turno.append(bloque_cebolla)
-                
-            # Unimos cada bloque_cebolla con Otoria
-            formula_movimiento_unico_lista.append(Otoria(bloques_turno))
+            formula_turnos = ""
 
-        # Unimos todo el movimiento único con Ytoria
-        formula_movimiento_unico = Ytoria(formula_movimiento_unico_lista)
-        return formula_movimiento_unico
+            # Para cada turno
+            for t in range(self.turnos):
+
+                # Dirección ida
+                atomo1 = self.To.ravel([(v1, v2), t])
+
+                # Dirección vuelta
+                atomo2 = self.To.ravel([(v2, v1), t])
+
+                # (To(v1,v2,t) O To(v2,v1,t))
+                bloque_turno = "(" + atomo1 + "O" + atomo2 + ")"
+
+                # Vamos armando la Otoria manualmente
+                if formula_turnos == "":
+                    formula_turnos = bloque_turno
+                else:
+                    formula_turnos = "(" + formula_turnos + "O" + bloque_turno + ")"
+
+            # Guardamos la fórmula completa de esta arista
+            formula_final_lista.append(formula_turnos)
+
+    # Ytoria entre todas las aristas
+        formula_final = formula_final_lista[0]
+
+        for f in formula_final_lista[1:]:
+            formula_final = "(" + formula_final + "Y" + f + ")"
+
+        return formula_final
 
     def regla4(self):
         
@@ -151,7 +160,7 @@ class Grafos:
         for (v1, v2) in self.aristas_base:
             # Todos los átomos relacionados con esta arista (ambas direcciones, todos los turnos)
             atomos_arista = []
-            for t in range(1,9):
+            for t in range(self.turnos):
                 atomos_arista.append(self.To.ravel([(v1, v2), t]))
                 atomos_arista.append(self.To.ravel([(v2, v1), t]))
         
@@ -165,7 +174,7 @@ class Grafos:
 
     def regla5(self):
         formula_lista = []  
-        for t in range(1, 9):
+        for t in range(1, self.turnos):
             for (i, j) in self.recorridos:
 
                 # disyunción de todos los (j,k) en recorridos 
