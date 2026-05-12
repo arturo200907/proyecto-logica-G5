@@ -778,4 +778,132 @@ def unit_propagate(S, I):
                 break
         if l == '': # Se recorrió todo S y no se encontró unidad
             break
-    return S, I
+    return S, I 
+
+
+from random import choice, uniform, randint
+
+class WalkSatEstado():
+    def __init__(self, S):
+        self.S = S
+        self.letrasp = list(set([l[-1] for C in self.S for l in C]))
+        
+        # Guardamos los indices donde sale cada literal
+        self.ocurrencias = {p: [] for p in self.letrasp}
+        self.ocurrencias.update({'-' + p: [] for p in self.letrasp})
+        for i, C in enumerate(self.S):
+            for lit in C:
+                self.ocurrencias[lit].append(i)
+        
+        # Arreglo para rastrear cuántos literales verdaderos tiene cada cláusula
+        self.num_true_in_clause = [0] * len(self.S)
+        # Usamos un Set para O(1) en inserción y borrado de cláusulas insatisfechas
+        self.clausulas_unsat = set()
+        
+        # Inicializar la primera interpretación
+        self.I = {}
+        self.reiniciar_interpretacion()
+
+    def reiniciar_interpretacion(self):
+        """Asigna valores aleatorios y recalcula contadores (usado en cada nuevo Trie)"""
+        self.I = {p: randint(0, 1) == 1 for p in self.letrasp}
+        self.clausulas_unsat.clear()
+        
+        for i, C in enumerate(self.S):
+            # Contar cuántos literales de esta cláusula son verdaderos
+            count = sum(1 for lit in C if self._es_verdadero(lit))
+            self.num_true_in_clause[i] = count
+            if count == 0:
+                self.clausulas_unsat.add(i)
+
+    def _es_verdadero(self, lit):
+        """Evalúa si un literal es verdadero bajo la interpretación actual self.I"""
+        if '-' in lit:
+            return not self.I[lit[1:]]
+        return self.I[lit]
+
+    def SAT(self):
+        return len(self.clausulas_unsat) == 0
+
+    def break_count(self, lit):
+        """
+        Calcula cuántas cláusulas satisfechas se volverían insatisfechas
+        si el literal 'lit' cambia su valor de True a False.
+        """
+        # Determinar el literal que actualmente es verdadero para esta variable
+        p = lit[-1]
+        lit_actualmente_true = p if self.I[p] else '-' + p
+        
+        breaks = 0
+        # Solo revisamos las cláusulas donde aparece el literal que va a "morir" (volverse False)
+        for idx in self.ocurrencias[lit_actualmente_true]:
+            # Si es el ÚNICO literal verdadero en la cláusula, romperla suma un break
+            if self.num_true_in_clause[idx] == 1:
+                breaks += 1
+        return breaks
+
+    def flip(self, lit):
+        """
+        Invierte el valor de la variable asociada al literal y actualiza
+        dinámicamente los contadores de satisfacción.
+        """
+        p = lit[-1]
+        old_val = self.I[p]
+        self.I[p] = not old_val # Mutación en sitio 
+        
+        # Determinar qué literal deja de ser verdadero y cuál empieza a serlo
+        lit_que_era_true = p if old_val else '-' + p
+        lit_que_ahora_es_true = '-' + p if old_val else p
+
+        # 1. Quitar un 'True' de las cláusulas donde estaba el literal anterior
+        for idx in self.ocurrencias[lit_que_era_true]:
+            self.num_true_in_clause[idx] -= 1
+            if self.num_true_in_clause[idx] == 0:
+                self.clausulas_unsat.add(idx)
+
+        # 2. Añadir un 'True' a las cláusulas donde está el nuevo literal
+        for idx in self.ocurrencias[lit_que_ahora_es_true]:
+            if self.num_true_in_clause[idx] == 0:
+                self.clausulas_unsat.remove(idx)
+            self.num_true_in_clause[idx] += 1
+
+
+def walkSAT(A, max_flips=1000, max_tries=100, p=0.5):
+    """
+    Algoritmo WalkSAT optimizado.
+    Recibe A (lista de listas de literales en FNC).
+    """
+    w = WalkSatEstado(A)
+    
+    for i in range(max_tries):
+        if i > 0:
+            w.reiniciar_interpretacion()
+            
+        for j in range(max_flips):
+            if w.SAT():
+                # Retornamos una copia simple del diccionario final
+                return 'Satisfacible', w.I.copy()
+            
+            # Elegir una cláusula al azar desde el Set (convertido a tupla/lista temporalmente)
+            C = choice(list(w.clausulas_unsat))
+            C_lits = w.S[C] # Obtenemos los literales reales de la cláusula
+            
+            #Revisa breaks
+            breaks = sorted([(l, w.break_count(l)) for l in C_lits], key=lambda x: x[1])
+            min_breaks = breaks[0]
+            
+            if min_breaks[1] == 0:
+                v = min_breaks[0]
+            else:
+                if uniform(0, 1) < p:
+                    v = choice(C_lits)
+                else:
+                    v = min_breaks[0]
+            
+            # Ejecutamos el flip nativo que actualiza el estado automáticamente
+            w.flip(v)
+            
+    return None, {}
+
+
+
