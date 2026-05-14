@@ -275,7 +275,7 @@ class Grafos:
                 nx.draw_networkx_edge_labels(
                     G,
                     pos,
-                    edge_labels={(v1, v2): f"Turno {",".join(map(str, aristas_ocupadas[(v1,v2)]))}"},
+                    edge_labels={(v1, v2): f"Turno {','.join(map(str, aristas_ocupadas[(v1,v2)]))}"},
                     font_color='red',
                     font_weight='bold',
                     bbox=propiedades_caja
