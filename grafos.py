@@ -22,7 +22,7 @@ def escribir_grafos(self, literal):
     
     # p es el índice de la tupla en la lista de recorridos
     # t es el tiempo
-    recorridos = self.args_lista[0] # Usamos self en lugar de To
+    recorridos = self.args_lista[0] 
     tupla = recorridos[p]
     
     return f"El vértice {tupla[0]}{neg} va al vértice {tupla[1]} en el turno {t}"
@@ -62,18 +62,19 @@ class Grafos:
 
         for recorrido in h_conec: 
             # El inicio es el movimiento actual de H
-            # No lleva "-" porque este es el que "ocurre"
+            # No lleva "-" porque es el primero
             formula_actual = self.To.ravel([recorrido, t])
             
             # Filtramos los otros movimientos
             otros_movimientos = [m for m in self.recorridos if m != recorrido]    
             
-            # CONSTRUCCIÓN DE LA FORMULA
+            # CONSTRUCCIÓN DE LA FORMULA 
+            # Se irá uniendo a la formula actual
             # Por cada iteración vamos concatenando lo que ya teníamos
             for mov in otros_movimientos: 
                 formula_actual = "(" + formula_actual + "Y-" + self.To.ravel([mov, t]) + ")"
             
-            # VAMOS AÑADIENDO A LA FORMULA FINAL LAS FORMULAS QUE VAMOS HACIENDO
+            # Vamos añadiendo cada formula_actual a la formula final
             if formula_final =="":
                 formula_final = formula_actual 
             else:
@@ -88,7 +89,7 @@ class Grafos:
         t = 7
 
         for recorrido in b_conec: 
-            movimiento_actual = recorrido  # Ya es una tupla (u, v)
+            movimiento_actual = recorrido  #
             
             # Filtramos los otros movimientos
             otros_movimientos = [m for m in self.recorridos if m != movimiento_actual]    
@@ -129,10 +130,10 @@ class Grafos:
                 # Dirección vuelta
                 atomo2 = self.To.ravel([(v2, v1), t])
 
-                # (To(v1,v2,t) O To(v2,v1,t))
+
                 bloque_turno = "(" + atomo1 + "O" + atomo2 + ")"
 
-                # Vamos armando la Otoria manualmente
+                # Armaremos la Otoria manualmente
                 if formula_turnos == "":
                     formula_turnos = bloque_turno
                 else:
@@ -204,7 +205,12 @@ class Grafos:
 
         return formula_completa  
     
-    #ESTA ES UNA FUNCIÓN AUXILIAR PARA VISUALIZAR QUE DEVUELVE UNA TRIPLA ("X","Y",t)
+
+    '''
+    -----------------------------------VISUALIZAR_GRAFO-------------------------
+    '''
+
+    #ESTA ES UNA FUNCIÓN AUXILIAR QUE DEVUELVE UNA TRIPLA ("X","Y",t)
     def triple_conversion(self, atomo): 
         p, t = self.To.unravel(atomo)   
         recorridos = self.To.args_lista[0]
@@ -219,6 +225,7 @@ class Grafos:
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
         pos = {
+            #Cuadramos posiciones para que se vea como en el gráfico del enunciado
             'C': (1, 2), 'D': (3, 2),
             'A': (0, 1), 'B': (2, 1), 'E': (4, 1),
             'G': (1, 0), 'H': (3, 0)
@@ -244,7 +251,7 @@ class Grafos:
             )
             #NO QUEREMOS QUE UN TIEMPO TAPE AL OTRO, ASI QUE CADA VEZ QUE SE REPITAN LAS ARISTAS 
             #IREMOS ACUMULANDO LOS TIEMPOS MEDIANTE UN DICCIONARIO QUE TENDRÁ LA FORMA DE 
-            #{(TUPLA1):[TIEMPOS], (TUPLA2):[TIEMPOS]
+            #{(TUPLA1):[TIEMPOS], (TUPLA2):[TIEMPOS]}
             aristas_ocupadas = {}
 
             for triple in movement_list:  
@@ -271,7 +278,7 @@ class Grafos:
                     arrowstyle='->',
                     arrowsize=30
                 )
-
+                #Dibujamos las etiquetas de los turnos en los vertices ocupados
                 nx.draw_networkx_edge_labels(
                     G,
                     pos,
