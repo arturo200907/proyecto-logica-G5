@@ -783,6 +783,16 @@ def unit_propagate(S, I):
 
 from random import choice, uniform, randint
 
+def interpretacion_aleatoria(letrasp):
+    I = {p:randint(0,1)==1 for p in letrasp} 
+    return I
+
+def flip_literal(I, l):
+    p = l[-1]
+    valor = False if I[p] else True
+    Ip = deepcopy(I)
+    Ip[p] = valor
+    return Ip
 class WalkSatEstado():
 
     def __init__(self, S):
