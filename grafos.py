@@ -219,7 +219,7 @@ class Grafos:
     
 
     def visualizar_grafo(self, dict_atomos=None, custom_size=(5,6)):    
-
+        
         
         plt.figure(figsize=custom_size)  
         G = nx.Graph()        

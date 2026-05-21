@@ -888,4 +888,5 @@ def filtro(dict_tseitin, regla):
     letras = h.letras()
     for letter in dict_tseitin.copy(): 
         if letter not in letras: 
-            del dict_tseitin[letter] 
+            del dict_tseitin[letter]  
+    return dict_tseitin
