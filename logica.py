@@ -716,7 +716,8 @@ def tseitin(A):
     B = [val for sublist in B for val in sublist]
     return B 
 
-def dpll(S, I):
+def dpll(S, I, A_original=None):
+    #Para que funcione con el filtro ahora es necesario pasarle la original también.
     '''
     Algoritmo para verificar la satisfacibilidad de una formula, y encontrar un modelo de la misma
     Input:
@@ -725,23 +726,24 @@ def dpll(S, I):
     Output:
         - String, Satisfacible/Insatisfacible
         - I ,interpretacion (diccionario literal->True/False)
-    '''
+    ''' 
+
     S, I = unit_propagate(S, I)
     if len(S) == 0:
-        return "Satisfacible", I
+        return "Satisfacible", filtro(I,A_original)
     if [] in S:
         return "Insatisfacible", {}
     l = choice(choice(S))
     lc = complemento(l)
     newS = eliminar_literal(S, l)
     newI = extender_I(I, l)
-    sat, newI = dpll(newS, newI)
+    sat, newI = dpll(newS, newI, A_original)
     if sat == "Satisfacible":
         return sat, newI
     else:
         newS = eliminar_literal(S, lc)
         newI = extender_I(I, lc)
-        return dpll(newS, newI) 
+        return dpll(newS, newI, A_original)
     
 def complemento(l):
     if '-' in l:
@@ -831,7 +833,7 @@ def walkSAT(A, max_flips=1000, max_tries=100, p=.5):
         w.actualizar(interpretacion_aleatoria(w.letrasp))
         for j in range(max_flips):
             if w.SAT():
-                return 'Satisfacible', w.I
+                return 'Satisfacible', filtro(w.I, A)
             C = choice(w.clausulas_unsat)
             breaks = sorted([(l,w.break_count(l)) for l in C], key=lambda x: x[1])
             min_breaks = breaks[0]

@@ -238,7 +238,6 @@ class Grafos:
             #si es satisfacible o no y en la segunda el modelo. 
             if isinstance(dict_atomos, tuple): 
                 dict_atomos = dict_atomos[1] 
-
             movement_list = [] 
             #IMPORTANTE: DEL DICCIONARIO SOLO TOMAMOS AQUELLOS VALORES QUE SON VERDADEROS
             for atomo in dict_atomos: 
