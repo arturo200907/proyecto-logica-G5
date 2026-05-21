@@ -843,5 +843,46 @@ def walkSAT(A, max_flips=1000, max_tries=100, p=.5):
             w.actualizar(I)
     return None, {}
 
+def SATsolver(A):
+    
+    def lit_numero(l):
+        if '-' in l:
+            #Se suma 1 para evitar el caso de que el numero sea 0 
+            return -(ord(l[1:]) +1)
+        else:
+            return ord(l) +1
+    
+    def clausula_numero(C):
+        return [lit_numero(l) for l in C]
 
+    def fnc_numero(S):
+        return [clausula_numero(C) for C in S]
 
+    def obtener_int(mod):
+        #Restamos 1 para quitar el +1 sumado
+        return {chr(abs(n)-1):n>0 for n in mod}
+    
+    def obtener_numeros(S):
+        lista_plana = [abs(x) for sublist in S for x in sublist]
+        lista_plana = list(set(lista_plana))
+        return lista_plana
+    S = tseitin(A)
+    S = fnc_numero(S)
+    numeros = obtener_numeros(S)
+    solucion = pycosat.solve(S)
+    solucion = [x for x in solucion if abs(x) in numeros]
+    solucion = obtener_int(solucion)
+    with Minisat22(bootstrap_with=S) as m:
+        if m.solve():
+            return 'Satisfacible', obtener_int(m.get_model())
+        else:
+            return 'Insatisfacible', {}
+
+def filtro(dict_tseitin, regla): 
+    h = inorder_to_tree(regla) 
+    letras = h.letras()
+    for letter in dict_tseitin.copy(): 
+        if letter not in letras: 
+            del dict_tseitin[letter] 
+
+    return dict_tseitin
