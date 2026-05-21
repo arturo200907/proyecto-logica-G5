@@ -3,7 +3,8 @@ import numpy as np
 from copy import deepcopy
 from typing import List, Dict 
 from random import choice, uniform, randint  
-import pycosat 
+import pycosat  
+import string
 from pysat.solvers import Minisat22
 
 #Para que corra hay que tener en el sistema todas las librerías instaladas
@@ -716,8 +717,14 @@ def tseitin(A):
     B = [val for sublist in B for val in sublist]
     return B 
 
-def dpll(S, I, A_original=None):
-    #Para que funcione con el filtro ahora es necesario pasarle la original también.
+
+def dpll(S, I = {}, A_original=None): 
+    
+    if isinstance(S, str): 
+        #Guardamos la formula original 
+        A_original = S 
+        #Pasamos a tseitin 
+        S = tseitin(S) 
     '''
     Algoritmo para verificar la satisfacibilidad de una formula, y encontrar un modelo de la misma
     Input:
