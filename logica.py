@@ -865,7 +865,8 @@ def SATsolver(A):
     def obtener_numeros(S):
         lista_plana = [abs(x) for sublist in S for x in sublist]
         lista_plana = list(set(lista_plana))
-        return lista_plana
+        return lista_plana 
+
     S = tseitin(A)
     S = fnc_numero(S)
     numeros = obtener_numeros(S)
@@ -874,7 +875,7 @@ def SATsolver(A):
     solucion = obtener_int(solucion)
     with Minisat22(bootstrap_with=S) as m:
         if m.solve():
-            return 'Satisfacible', obtener_int(m.get_model())
+            return 'Satisfacible', filtro(obtener_int(m.get_model()), A)
         else:
             return 'Insatisfacible', {}
 
@@ -884,5 +885,3 @@ def filtro(dict_tseitin, regla):
     for letter in dict_tseitin.copy(): 
         if letter not in letras: 
             del dict_tseitin[letter] 
-
-    return dict_tseitin
