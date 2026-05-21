@@ -2,7 +2,11 @@ from itertools import product
 import numpy as np
 from copy import deepcopy
 from typing import List, Dict 
-from random import choice, uniform, randint
+from random import choice, uniform, randint  
+import pycosat 
+from pysat.solvers import Minisat22
+
+#Para que corra hay que tener en el sistema todas las librerías instaladas
 
 
 '''
