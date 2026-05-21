@@ -826,14 +826,16 @@ class WalkSatEstado():
         clausulas_break_count = [C for C in self.clausulas_sat if set(C).intersection(self.I_lits)=={lit}]
         return len(clausulas_break_count)
 
-def walkSAT(A, max_flips=1000, max_tries=100, p=.5):
-
+def walkSAT(A, max_flips=1000, max_tries=100, p=.5):  
+    #Guardamos la formula original
+    A_original = A
+    A = tseitin(A)
     w = WalkSatEstado(A)
     for i in range(max_tries):
         w.actualizar(interpretacion_aleatoria(w.letrasp))
         for j in range(max_flips):
             if w.SAT():
-                return 'Satisfacible', filtro(w.I, A)
+                return 'Satisfacible', filtro(w.I, A_original)
             C = choice(w.clausulas_unsat)
             breaks = sorted([(l,w.break_count(l)) for l in C], key=lambda x: x[1])
             min_breaks = breaks[0]
