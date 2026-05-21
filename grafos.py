@@ -220,7 +220,6 @@ class Grafos:
 
     def visualizar_grafo(self, dict_atomos=None, custom_size=(5,6)):    
         
-        
         plt.figure(figsize=custom_size)  
         G = nx.Graph()        
         G.add_edges_from(self.aristas_base)    
@@ -234,7 +233,12 @@ class Grafos:
         nx.draw_networkx_labels(G, pos, font_weight='bold')
         nx.draw_networkx_edges(G, pos, width=2, edge_color='black',)
         
-        if dict_atomos is not None: 
+        if dict_atomos is not None:  
+            #Miraremos el tipo de dict_atomos, pues tambien puede ser una tupla que lleva en la primera posición 
+            #si es satisfacible o no y en la segunda el modelo. 
+            if isinstance(dict_atomos, tuple): 
+                dict_atomos = dict_atomos[1] 
+
             movement_list = [] 
             #IMPORTANTE: DEL DICCIONARIO SOLO TOMAMOS AQUELLOS VALORES QUE SON VERDADEROS
             for atomo in dict_atomos: 
